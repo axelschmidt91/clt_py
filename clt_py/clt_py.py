@@ -18,7 +18,6 @@ class OverDeterminedError(Exception):
 class Material:
 
     def __init__(self, E=None, rho, G=None, v=None):
-        super().__init__()
         self.rho = rho
         if G is not None & v is not None & E is not None:
             OverDeterminedError()
@@ -36,6 +35,14 @@ class Material:
             self.E = E
             self.G = G
             self.v = E / (2 * G) - 1
+            if isinstance(self.v, list()):
+                if len(self.v) == self.v.count(self.v[0]):
+                    self.v = self.v[0]
+                else:
+                    OverDeterminedError()
+        self.isotropic = True
+        if isinstance(self.E, list()):
+            self.isotropic = False
 
 
 class Ply:
