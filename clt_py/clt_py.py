@@ -47,9 +47,7 @@ class Ply:
         self.fibVolRatio = fibVolRatio
 
     def set_fibWgRatio(self, fibWgRatio):
-        self.fibVolRatio =
-        (fibWgRatio * self.matMat.rho)
-        / (fibWgRatio * self.matMat.rho + (1 - fibWgRatio) * self.matFib.rho)
+        self.fibVolRatio = (fibWgRatio * self.matMat.rho) / (fibWgRatio * self.matMat.rho + (1 - fibWgRatio) * self.matFib.rho)
 
     def set_fibVolRatio(self, fibVolRatio):
         self.fibVolRatio = fibVolRatio
