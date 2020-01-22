@@ -16,6 +16,7 @@ def response():
     """
     import requests
     return requests.get('https://github.com/audreyr/cookiecutter-pypackage')
-   
+
+
 def test_add():
-    assert clt_py.add(1,2) == 3
+    assert clt_py.add(1, 2) == 3
