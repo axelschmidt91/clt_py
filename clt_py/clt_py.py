@@ -1,47 +1,55 @@
 """Main module."""
 
 
-def add(a, b):
-    return a + b
-
-
 class NotEnoughArgumentError(Exception):
     """Exception raised when too few arguments where passed to function."""
     pass
 
 
 class OverDeterminedError(Exception):
-    """Raised when too many arguments where passed. 
+    """Raised when too many arguments where passed.
     So the system is over-determined."""
+    pass
 
 
 class Material:
 
-    def __init__(self, E=None, rho, G=None, v=None):
+    def __init__(self, rho, E=None, G=None, v=None):
         self.rho = rho
-        if G is not None & v is not None & E is not None:
-            OverDeterminedError()
-        elif G is None & v is None | G is None & E is None | E is None & v is None:
-            NotEnoughArgumentError()
+        if (G is not None) and (v is not None) and (E is not None):
+            raise OverDeterminedError()
+        elif (((G is None) and (v is None)) or ((G is None) and (E is None)) or ((E is None) and (v is None))):
+            raise NotEnoughArgumentError()
         elif G is None:
             self.E = E
             self.v = v
-            self.G = E / (2 * (1 + v))
+            if isinstance(E, list):
+                self.G = [x / (2 * (1 + v)) for x in E]
+            else:
+                self.G = E / (2 * (1 + v))
         elif E is None:
             self.G = G
             self.v = v
-            self.E = 2 * G * (1 + v)
+            if isinstance(G, list):
+                self.E = [2 * x * (1 + v) for x in G]
+            else:
+                self.E = 2 * G * (1 + v)
         elif v is None:
             self.E = E
             self.G = G
-            self.v = E / (2 * G) - 1
-            if isinstance(self.v, list()):
+            if isinstance(E, list) or isinstance(G, list):
+                self.v = [x / (2 * y) - 1 for x, y in zip(E, G)]
+            else:
+                self.v = E / (2 * G) - 1
+            if isinstance(self.v, list):
                 if len(self.v) == self.v.count(self.v[0]):
                     self.v = self.v[0]
                 else:
-                    OverDeterminedError()
+                    raise OverDeterminedError()
+        else:
+            raise NotImplementedError()
         self.isotropic = True
-        if isinstance(self.E, list()):
+        if isinstance(self.E, list):
             self.isotropic = False
 
 
