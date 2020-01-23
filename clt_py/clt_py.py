@@ -1,5 +1,6 @@
 """Main module."""
 
+from math import sqrt, sin, cos, pi, atan
 import math
 import numpy as np
 
@@ -82,6 +83,26 @@ class FiberReinforcedMaterialUD(Material2D):
     def __init__(
         self, matFib, matMat, fibVolRatio=0.5, kapa=[1, 1, 1], label="FRM_material"
     ):
+        """Fiber Reinforced Material containing of isotropic matrix and anisotropic fiber.
+
+        :param matFib: fiber material
+        :type matFib: AnisotropicMaterial
+        :param matMat: matrix material
+        :type matMat: IsotropicMaterial
+        :param fibVolRatio: fiber-volume-ratio [0,1], defaults to 0.5
+        :type fibVolRatio: float, optional
+        :param kapa: manufactoring reduction factor. \
+            kapa[0]: reduction for E_para (Youngs modulus in fiber axis). \
+            kapa[1]: reduction for E_ortho. \
+            kapa[2]: reduction for G (shear modulus). \
+            Values in range (0,1]., defaults to [1, 1, 1]
+        :type kapa: list, optional
+        :param label: description of material, defaults to "FRM_material"
+        :type label: str, optional
+        :raises ValueError: Not defined value for this input
+        :raises Material2D.NotAnisotropicError: AnisotropicMaterial required
+        :raises Material2D.NotIsotropicError: IsotropicMaterial required
+        """
         GLOBAL_FRM_LIST.append(self)
         self.check_matFib(matFib)
         self.matFib = matFib
@@ -162,7 +183,7 @@ class FiberReinforcedMaterialUD(Material2D):
 
     def hsb_model(self):
         # helping variables
-        v = math.sqrt(self.fibVolRatio / math.pi)
+        v = sqrt(self.fibVolRatio / pi)
         e = 1 - self.matMat.E_para / self.matFib.E_ortho
         g = 1 - self.matMat.G / self.matFib.G
         q_G = (1 + 2 * g * v) / (1 - 2 * g * v)
@@ -178,11 +199,8 @@ class FiberReinforcedMaterialUD(Material2D):
             * (
                 1
                 - 2 * v
-                - math.pi / (2 * e)
-                + (
-                    (2 * math.atan(math.sqrt(q_E)))
-                    / (e * math.sqrt(1 - math.pow(2 * e * v, 2)))
-                )
+                - pi / (2 * e)
+                + ((2 * atan(sqrt(q_E))) / (e * sqrt(1 - math.pow(2 * e * v, 2))))
             )
         )
         self.G = (
@@ -191,11 +209,8 @@ class FiberReinforcedMaterialUD(Material2D):
             * (
                 1
                 - 2 * v
-                - math.pi / (2 * g)
-                + (
-                    (2 * math.atan(math.sqrt(q_G)))
-                    / (g * math.sqrt(1 - math.pow(2 * g * v, 2)))
-                )
+                - pi / (2 * g)
+                + ((2 * atan(sqrt(q_G))) / (g * sqrt(1 - math.pow(2 * g * v, 2))))
             )
         )
         self.v_para_ortho = (
@@ -213,15 +228,84 @@ class FiberReinforcedMaterialUD(Material2D):
 
 
 class Ply:
-    def __init__(self, reinforcedMat, thickness, rotation=0):
+    def __init__(self, material, thickness=1, rotation=0):
+        """Ply for building Laminates.
+
+        :param reinforcedMat: Material for ply (reinforced, isotropic)
+        :type reinforcedMat: {FiberReinforcedMaterialUD, IsotropicMaterial}
+        :param thickness: Thickness of layer/ply in mm, defaults to 1
+        :type thickness: float, optional
+        :param rotation: Rotation of ply in relation to laminate axis. \
+            Unit=[°], defaults to 0
+        :type rotation: float, optional
+        """
         super().__init__()
-        self.mat = reinforcedMat
+        self.check_materialType(material)
+        self.mat = material
+        self.thickness = thickness
+        self.rotRad = math.radians(rotation)
+
+    def check_materialType(self, material):
+        if isinstance(material, FiberReinforcedMaterialUD):
+            self.matType = "fibReinfMat"
+        elif isinstance(material, IsotropicMaterial):
+            self.matType = "isotropicMat"
+        else:
+            raise TypeError(
+                "material must either 'FiberReinforcedMaterialUD' or 'IsotropicMaterial'"
+            )
+
+    def calc_rotationStressMatrix(self):
+        self.rotStress = np.array(
+            [
+                [
+                    sqrt(cos(self.rotRad)),
+                    sqrt(sin(self.rotRad)),
+                    2 * sin(self.rotRad) * cos(self.rotRad),
+                ],
+                [
+                    sqrt(sin(self.rotRad)),
+                    sqrt(cos(self.rotRad)),
+                    -2 * sin(self.rotRad) * cos(self.rotRad),
+                ],
+                [
+                    -sin(self.rotRad) * cos(self.rotRad),
+                    sin(self.rotRad) * cos(self.rotRad),
+                    sqrt(cos(self.rotRad)) - sqrt(sin(self.rotRad)),
+                ],
+            ]
+        )
+
+    def calc_rotationElongationMatrix(self):
+        self.rotElongation = np.array(
+            [
+                [
+                    sqrt(cos(self.rotRad)),
+                    sqrt(sin(self.rotRad)),
+                    sin(self.rotRad) * cos(self.rotRad),
+                ],
+                [
+                    sqrt(sin(self.rotRad)),
+                    sqrt(cos(self.rotRad)),
+                    -sin(self.rotRad) * cos(self.rotRad),
+                ],
+                [
+                    -2 * sin(self.rotRad) * cos(self.rotRad),
+                    2 * sin(self.rotRad) * cos(self.rotRad),
+                    sqrt(cos(self.rotRad)) - sqrt(sin(self.rotRad)),
+                ],
+            ]
+        )
 
 
 class Laminate:
-    def __init__(self):
+    def __init__(self, core=False, symetric=False):
         super().__init__()
         self.stack = []
+        self.create_finalStack()
 
-    def addPly(self, rotation=0):
+    def addPly(self, ply):
+        pass
+
+    def create_finalStack(self):
         pass
