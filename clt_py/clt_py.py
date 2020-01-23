@@ -60,7 +60,7 @@ class AnisotropicMaterial(Material):
         self.v = v
 
 
-class Ply:
+class PlyUD:
 
     system = "hsb"  # "prismatic_jones" or "hsb"
 
