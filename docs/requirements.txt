@@ -1,1 +1,1 @@
-sphinx-glpi-theme
+sphinx-glpi-theme==0.3
