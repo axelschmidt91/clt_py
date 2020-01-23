@@ -6,6 +6,7 @@ python:
 install:
 - pip install -U tox-travis
 - pip install coveralls
+- pip install flake8
 
 before_script:
     # run black to check if some files would need reformatting
