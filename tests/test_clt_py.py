@@ -5,7 +5,7 @@
 import pytest
 
 
-from clt_py import clt_py
+from clt_py import *
 from clt_py.clt_py import *
 
 
