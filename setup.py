@@ -18,7 +18,7 @@ test_requirements = ['pytest>=3', ]
 
 setup(
     author="Axel Schmidt",
-    author_email='axel.schmidt.91@gmail.com',
+    author_email='schmidt.axel.91@gmail.com',
     python_requires='>=3.5',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',

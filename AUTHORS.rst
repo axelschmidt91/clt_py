@@ -5,7 +5,7 @@ Credits
 Development Lead
 ----------------
 
-* Axel Schmidt <axel.schmidt.91@gmail.com>
+* Axel Schmidt <schmidt.axel.91@gmail.com>
 
 Contributors
 ------------
