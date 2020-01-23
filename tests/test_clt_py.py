@@ -79,17 +79,17 @@ def test_FiberReinforcedMaterialUD_hsb_model():
     pass
 
 
-# def test_FiberReinforcedMaterialUD_nonValid_model():
-#     matMat = IsotropicMaterial(rho=1, E=1, v=0.25)
-#     matFib = AnisotropicMaterial(rho=2, v_para_ortho=0.25, E_para=10, E_ortho=2, G=3)
+def test_FiberReinforcedMaterialUD_nonValid_model():
+    matMat = IsotropicMaterial(rho=1, E=1, v=0.25)
+    matFib = AnisotropicMaterial(rho=2, v_para_ortho=0.25, E_para=10, E_ortho=2, G=3)
 
-#     ply = FiberReinforcedMaterialUD(matFib=matFib, matMat=matMat, kapa=[0.8, 0.8, 0.8])
+    ply = FiberReinforcedMaterialUD(matFib=matFib, matMat=matMat, kapa=[0.8, 0.8, 0.8])
 
-#     with pytest.raises(ValueError):
-#         assert ply.set_system("test")
+    with pytest.raises(ValueError):
+        assert ply.set_system("test")
 
 
-def test_FiberReinforcedMaterialUD_set_maMat():
+def test_FiberReinforcedMaterialUD_set_matMat():
     matMat = IsotropicMaterial(rho=1, E=1, v=0.25)
     matMat2 = IsotropicMaterial(rho=1, E=1, v=0.25)
     matMat3 = AnisotropicMaterial(rho=2, v_para_ortho=0.25, E_para=10, E_ortho=2, G=3)
