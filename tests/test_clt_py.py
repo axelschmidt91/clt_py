@@ -52,10 +52,30 @@ def test_Ply():
 
 
 def test_Ply_prismatic_jones_model():
-    # TODO: Implement
+    matMat = IsotropicMaterial(rho=1, E=1, v=0.25)
+    matFib = AnisotropicMaterial(rho=2, v=0.25, E_para=10, E_ortho=2, G=3)
+
+    ply = Ply(matFib=matFib, matMat=matMat)
+    ply.system = "prismatic_jones"
+    ply.update()
+    assert ply.E_para == 5.5
+    assert round(ply.E_ortho, 3) == 1.333
+    assert round(ply.G, 3) == 0.706
+    assert ply.v_para_ortho == 0.25
     pass
 
 
 def test_Ply_hsb_model():
-    # TODO: Implement
+    matMat = IsotropicMaterial(rho=1, E=1, v=0.25)
+    matFib = AnisotropicMaterial(rho=2, v=0.25, E_para=10, E_ortho=2, G=3)
+
+    ply = Ply(matFib=matFib, matMat=matMat, kapa=[0.8, 0.8, 0.8])
+    Ply.system = "hsb"
+    ply.update()
+    assert round(ply.E_para, 3) == 4.4
+    assert round(ply.E_ortho, 3) == 1.105
+    assert round(ply.G, 3) == 0.678
+    assert round(ply.v_para_ortho, 3) == 0.25
+    assert round(ply.v_ortho_para, 3) == 0.063
+    assert round(ply.rho, 3) == 1.5
     pass

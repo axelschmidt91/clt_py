@@ -62,7 +62,7 @@ class AnisotropicMaterial(Material):
 
 class Ply:
 
-    system = "prismatic_jones"  # "prismatic_jones" or "hsb"
+    system = "hsb"  # "prismatic_jones" or "hsb"
 
     def __init__(self, matFib, matMat, fibVolRatio=0.5, kapa=[1, 1, 1]):
         super().__init__()
@@ -72,6 +72,7 @@ class Ply:
         self.matMat = matMat
         self.fibVolRatio = fibVolRatio
         self.kapa = kapa
+        self.update()
 
     def set_fibWgRatio(self, fibWgRatio):
         self.fibVolRatio = (fibWgRatio * self.matMat.rho) / (fibWgRatio * self.matMat.rho + (1 - fibWgRatio) * self.matFib.rho)
@@ -102,7 +103,7 @@ class Ply:
     def update(self):
         if self.system is "prismatic_jones":
             self.prismatic_jones_model()
-        elif system is "hsb":
+        elif self.system is "hsb":
             self.hsb_model()
         else:
             raise ValueError
@@ -124,8 +125,8 @@ class Ply:
         q_E = (1 + 2 * e * v) / (1 - 2 * e * v)
 
         self.E_para = self.kapa[0] * (self.matFib.E_para * self.fibVolRatio + self.matMat.E * (1 - self.fibVolRatio))
-        self.E_ortho = self.kapa[1] * self.matMat.E * (1 - 2 * v - math.pi / (2 * e) + (2 * math.atan(math.sqrt(q_E))) / (e * math.sqrt(1 - math.pow(2 * g * v, 2))))
-        self.G = self.kapa[2] * self.matMat.G * [1 - 2 * v - math.pi / (2 * g) + (2 * math.atan(math.sqrt(q_G))) / (g * math.sqrt(1 - math.pow(2 * g * v, 2)))]
+        self.E_ortho = self.kapa[1] * self.matMat.E * (1 - 2 * v - math.pi / (2 * e) + (2 * math.atan(math.sqrt(q_E))) / (e * math.sqrt(1 - math.pow(2 * e * v, 2))))
+        self.G = self.kapa[2] * self.matMat.G * (1 - 2 * v - math.pi / (2 * g) + (2 * math.atan(math.sqrt(q_G))) / (g * math.sqrt(1 - math.pow(2 * g * v, 2))))
         self.v_para_ortho = self.matFib.v * self.fibVolRatio + self.matMat.v * (1 - self.fibVolRatio)
         self.calc_poissonRatio_ortho_pata()
         self.calc_density()
@@ -134,7 +135,7 @@ class Ply:
         self.v_ortho_para = self.v_para_ortho * self.E_ortho / self.E_para
 
     def calc_density(self):
-        self.rho = (self.fibVolRatio + self.matMat.rho / self.matMat.rho * (1 - self.fibVolRatio)) * self.matFib.rho
+        self.rho = (self.fibVolRatio + self.matMat.rho / self.matFib.rho * (1 - self.fibVolRatio)) * self.matFib.rho
 
 
 class Laminate:
