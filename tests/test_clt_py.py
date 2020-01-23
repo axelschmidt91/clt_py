@@ -69,9 +69,7 @@ def test_FiberReinforcedMaterialUD_hsb_model():
     matMat = IsotropicMaterial(rho=1, E=1, v=0.25)
     matFib = AnisotropicMaterial(rho=2, v=0.25, E_para=10, E_ortho=2, G=3)
 
-    ply = FiberReinforcedMaterialUD(matFib=matFib,
-                                    matMat=matMat,
-                                    kapa=[0.8, 0.8, 0.8])
+    ply = FiberReinforcedMaterialUD(matFib=matFib, matMat=matMat, kapa=[0.8, 0.8, 0.8])
     FiberReinforcedMaterialUD.system = "hsb"
     ply.update()
     assert round(ply.E_para, 3) == 4.4
