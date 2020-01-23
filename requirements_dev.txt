@@ -7,8 +7,8 @@ tox==3.14.3
 coverage==5.0.3
 Sphinx==2.3.1
 twine==3.1.1
-
 pytest==5.3.4
 pytest-runner==5.2
+sphinx==2.3.1
 sphinx-glpi-theme==0.3
 coveralls==1.10.0
