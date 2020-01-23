@@ -47,7 +47,7 @@ def test_Material_anisotropic():
 
 def test_Ply():
     matMat = Material(rho=1, E=1, v=0.25)
-    matFib = Material(rho=2, E=10, v=0.25)
+    matFib = Material(rho=2, E=[10, 1], v=0.25)
 
     ply = Ply(matFib=matFib, matMat=matMat)
 

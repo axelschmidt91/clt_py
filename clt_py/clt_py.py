@@ -91,19 +91,19 @@ class Ply:
 
     def check_matFib(self, matFib):
         # TODO: check for isinstance of Anisotropic class
-        if isinstance(matFib, list):
-            if len(matFib) <= 1:
+        if isinstance(matFib.E, list):
+            if len(matFib.E) <= 1:
                 raise Material.NotAnisotropicError()
         else:
             raise Material.NotAnisotropicError()
 
     def check_matMat(self, matMat):
         # TODO: check for isinstance of Isotropic class
-        if isinstance(matMat, list):
+        if isinstance(matMat.E, list):
             raise Material.NotIsotropicError()
 
     def update(self):
-        if system is "simplified":
+        if self.system is "simplified":
             self.prismatic_jones_model()
         elif system is "hsb":
             self.hsb_model()
@@ -111,7 +111,9 @@ class Ply:
             raise ValueError
 
     def prismatic_jones_model(self):
+        return
         raise NotImplementedError()
+        # TODO: Finish implementation
         E_para = self.matFib.E[0] * self.fibVolRatio + self.matMat.E * (1 - self.fibVolRatio)
         E_orto = (self.matFib.E[1] * self.matMat.E) / (self.matMat.E * self.fibVolRatio + self.matFib.E[1] * (1 - self.fibVolRatio))
         self.E = [E_para, E_orto]
