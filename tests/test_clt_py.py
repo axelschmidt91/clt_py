@@ -56,8 +56,7 @@ def test_FiberReinforcedMaterialUD_prismatic_jones_model():
     matFib = AnisotropicMaterial(rho=2, v_para_ortho=0.25, E_para=10, E_ortho=2, G=3)
 
     ply = FiberReinforcedMaterialUD(matFib=matFib, matMat=matMat)
-    ply.system = "prismatic_jones"
-    ply.update()
+    ply.set_system("prismatic_jones")
     assert ply.E_para == 5.5
     assert round(ply.E_ortho, 3) == 1.333
     assert round(ply.G, 3) == 0.706
@@ -70,8 +69,7 @@ def test_FiberReinforcedMaterialUD_hsb_model():
     matFib = AnisotropicMaterial(rho=2, v_para_ortho=0.25, E_para=10, E_ortho=2, G=3)
 
     ply = FiberReinforcedMaterialUD(matFib=matFib, matMat=matMat, kapa=[0.8, 0.8, 0.8])
-    FiberReinforcedMaterialUD.system = "hsb"
-    ply.update()
+    FiberReinforcedMaterialUD.set_system("hsb")
     assert round(ply.E_para, 3) == 4.4
     assert round(ply.E_ortho, 3) == 1.105
     assert round(ply.G, 3) == 0.678
@@ -79,3 +77,43 @@ def test_FiberReinforcedMaterialUD_hsb_model():
     assert round(ply.v_ortho_para, 3) == 0.063
     assert round(ply.rho, 3) == 1.5
     pass
+
+
+# def test_FiberReinforcedMaterialUD_nonValid_model():
+#     matMat = IsotropicMaterial(rho=1, E=1, v=0.25)
+#     matFib = AnisotropicMaterial(rho=2, v_para_ortho=0.25, E_para=10, E_ortho=2, G=3)
+
+#     ply = FiberReinforcedMaterialUD(matFib=matFib, matMat=matMat, kapa=[0.8, 0.8, 0.8])
+
+#     with pytest.raises(ValueError):
+#         assert ply.set_system("test")
+
+
+def test_FiberReinforcedMaterialUD_set_maMat():
+    matMat = IsotropicMaterial(rho=1, E=1, v=0.25)
+    matMat2 = IsotropicMaterial(rho=1, E=1, v=0.25)
+    matMat3 = AnisotropicMaterial(rho=2, v_para_ortho=0.25, E_para=10, E_ortho=2, G=3)
+    matFib = AnisotropicMaterial(rho=2, v_para_ortho=0.25, E_para=10, E_ortho=2, G=3)
+
+    ply = FiberReinforcedMaterialUD(matFib=matFib, matMat=matMat, kapa=[0.8, 0.8, 0.8])
+
+    ply.set_matMat(matMat2)
+    assert round(ply.E_para, 3) == 4.4
+
+    with pytest.raises(Material2D.NotIsotropicError):
+        assert ply.set_matMat(matMat3)
+
+
+def test_FiberReinforcedMaterialUD_set_matFib():
+    matMat = IsotropicMaterial(rho=1, E=1, v=0.25)
+    matFib = AnisotropicMaterial(rho=2, v_para_ortho=0.25, E_para=10, E_ortho=2, G=3)
+    matFib2 = AnisotropicMaterial(rho=2, v_para_ortho=0.25, E_para=10, E_ortho=2, G=3)
+    matFib3 = IsotropicMaterial(rho=1, E=1, v=0.25)
+
+    ply = FiberReinforcedMaterialUD(matFib=matFib, matMat=matMat, kapa=[0.8, 0.8, 0.8])
+
+    ply.set_matFib(matFib2)
+    assert round(ply.E_para, 3) == 4.4
+
+    with pytest.raises(Material2D.NotAnisotropicError):
+        assert ply.set_matFib(matFib3)

@@ -71,13 +71,18 @@ class AnisotropicMaterial(Material2D):
     pass
 
 
+GLOBAL_FRM_LIST = []
+
+
 class FiberReinforcedMaterialUD(Material2D):
 
     system = "hsb"  # "prismatic_jones" or "hsb"
+    possible_systems = ["prismatic_jones", "hsb"]
 
     def __init__(
         self, matFib, matMat, fibVolRatio=0.5, kapa=[1, 1, 1], label="FRM_material"
     ):
+        GLOBAL_FRM_LIST.append(self)
         self.check_matFib(matFib)
         self.matFib = matFib
         self.check_matMat(matMat)
@@ -93,6 +98,14 @@ class FiberReinforcedMaterialUD(Material2D):
             v_para_ortho=self.v_para_ortho,
             label=label,
         )
+
+    @classmethod
+    def set_system(cls, system):
+        if system not in cls.possible_systems:
+            raise ValueError("'{system}'-system is not implemented")
+        cls.system = system
+        for elem in GLOBAL_FRM_LIST:
+            elem.update()
 
     def set_fibWgRatio(self, fibWgRatio):
         self.fibVolRatio = (fibWgRatio * self.matMat.rho) / (
@@ -123,12 +136,10 @@ class FiberReinforcedMaterialUD(Material2D):
             raise Material2D.NotIsotropicError()
 
     def update(self):
-        if self.system == "prismatic_jones":
+        if self.system == self.possible_systems[0]:
             self.prismatic_jones_model()
-        elif self.system == "hsb":
+        elif self.system == self.possible_systems[1]:
             self.hsb_model()
-        else:
-            raise ValueError
         self.calc_stiffness_compliance_matrices()
 
     def prismatic_jones_model(self):
