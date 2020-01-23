@@ -81,7 +81,12 @@ class FiberReinforcedMaterialUD(Material2D):
     possible_systems = ["prismatic_jones", "hsb"]
 
     def __init__(
-        self, matFib, matMat, fibVolRatio=0.5, kapa=[1, 1, 1], label="FRM_material"
+        self,
+        matFib,
+        matMat,
+        fibVolRatio=0.5,
+        kapa=[1.0, 1.0, 1.0],
+        label="FRM_material",
     ):
         """Fiber Reinforced Material containing of isotropic matrix and anisotropic fiber.
 
@@ -228,7 +233,7 @@ class FiberReinforcedMaterialUD(Material2D):
 
 
 class Ply:
-    def __init__(self, material, thickness=1, rotation=0):
+    def __init__(self, material, thickness=1.0, rotation=0.0):
         """Ply for building Laminates.
 
         :param reinforcedMat: Material for ply (reinforced, isotropic)
@@ -244,6 +249,13 @@ class Ply:
         self.mat = material
         self.thickness = thickness
         self.rotRad = math.radians(rotation)
+        self.update()
+
+    def update(self):
+        self.calc_rotationElongationMatrix()
+        self.calc_rotationStressMatrix()
+        self.calc_stiffnessMatrix()
+        self.calc_complianceMatrix()
 
     def check_materialType(self, material):
         if isinstance(material, FiberReinforcedMaterialUD):
@@ -295,6 +307,18 @@ class Ply:
                     sqrt(cos(self.rotRad)) - sqrt(sin(self.rotRad)),
                 ],
             ]
+        )
+
+    def calc_complianceMatrix(self):
+        self.S = np.matmul(
+            self.rotElongation,
+            np.matmul(self.mat.complianceMatrix, np.linalg.inv(self.rotStress)),
+        )
+
+    def calc_stiffnessMatrix(self):
+        self.Q = np.matmul(
+            self.rotStress,
+            np.matmul(self.mat.stiffnessMatrix, np.linalg.inv(self.rotElongation)),
         )
 
 
