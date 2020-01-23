@@ -22,8 +22,6 @@ class Material:
     class NotIsotropicError(Exception):
         pass
 
-    # TODO: Subclasses for Anisitropic Material and isotropic Material. --> Independend material properties are different
-
     def __init__(self, rho, label="material"):
         super().__init__()
         self.rho = rho
@@ -34,7 +32,6 @@ class IsotropicMaterial(Material):
 
     def __init__(self, rho, label='material', E=None, G=None, v=None):
         super().__init__(rho, label=label)
-        super().__init__(rho, E=E, G=G, v=v)
         if (G is not None) and (v is not None) and (E is not None):
             raise OverDeterminedError()
         elif (((G is None) and (v is None)) or ((G is None) and (E is None)) or ((E is None) and (v is None))):
@@ -119,8 +116,6 @@ class Ply:
         self.calc_density()
 
     def hsb_model(self):
-        # TODO: Implementation
-        raise NotImplementedError()
         # helping variables
         v = math.sqrt(self.fibVolRatio / math.pi)
         e = 1 - self.matMat.E / self.matFib.E_ortho
