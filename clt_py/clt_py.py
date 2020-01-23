@@ -45,7 +45,7 @@ class Material2D:
         self.complianceMatrix = np.array(
             [[s_para, s_para_ortho, 0], [s_para_ortho, s_para, 0], [0, 0, s_shear]]
         )
-        self.stiffnessMatrix = np.invert(self.complianceMatrix)
+        self.stiffnessMatrix = np.linalg.inv(self.complianceMatrix)
 
 
 class IsotropicMaterial(Material2D):
@@ -64,18 +64,11 @@ class IsotropicMaterial(Material2D):
             E = 2 * G * (1 + v)
         elif v is None:
             v = E / (2 * G) - 1
-        super().__init__(
-            self, rho=rho, E_para=E, E_ortho=E, G=G, v_para_ortho=v, label=label
-        )
+        super().__init__(rho=rho, E_para=E, E_ortho=E, G=G, v_para_ortho=v, label=label)
 
 
 class AnisotropicMaterial(Material2D):
-    def __init__(self, rho, E_para, E_ortho, G, v_para_ortho, label="material"):
-        super().__init__(rho, label=label)
-        self.E_para = E_para
-        self.E_ortho = E_ortho
-        self.G = G
-        self.v_para_ortho = v_para_ortho
+    pass
 
 
 class FiberReinforcedMaterialUD(Material2D):
@@ -92,7 +85,14 @@ class FiberReinforcedMaterialUD(Material2D):
         self.fibVolRatio = fibVolRatio
         self.kapa = kapa
         self.update()
-        super().__init__(self.rho, label)
+        super().__init__(
+            rho=self.rho,
+            E_para=self.rho,
+            E_ortho=self.rho,
+            G=self.G,
+            v_para_ortho=self.v_para_ortho,
+            label=label,
+        )
 
     def set_fibWgRatio(self, fibWgRatio):
         self.fibVolRatio = (fibWgRatio * self.matMat.rho) / (
@@ -132,18 +132,19 @@ class FiberReinforcedMaterialUD(Material2D):
         self.calc_stiffness_compliance_matrices()
 
     def prismatic_jones_model(self):
-        self.E_para = self.matFib.E_para * self.fibVolRatio + self.matMat.E * (
+        self.E_para = self.matFib.E_para * self.fibVolRatio + self.matMat.E_para * (
             1 - self.fibVolRatio
         )
-        self.E_ortho = (self.matFib.E_ortho * self.matMat.E) / (
-            self.matMat.E * self.fibVolRatio
+        self.E_ortho = (self.matFib.E_ortho * self.matMat.E_para) / (
+            self.matMat.E_para * self.fibVolRatio
             + self.matFib.E_ortho * (1 - self.fibVolRatio)
         )
         self.G = (self.matFib.G * self.matMat.G) / (
             self.matMat.G * self.fibVolRatio + self.matFib.G * (1 - self.fibVolRatio)
         )
         self.v_para_ortho = (
-            self.fibVolRatio * self.matFib.v + (1 - self.fibVolRatio) * self.matMat.v
+            self.fibVolRatio * self.matFib.v_para_ortho
+            + (1 - self.fibVolRatio) * self.matMat.v_para_ortho
         )
         self.calc_poissonRatio_ortho_pata()
         self.calc_density()
@@ -151,18 +152,18 @@ class FiberReinforcedMaterialUD(Material2D):
     def hsb_model(self):
         # helping variables
         v = math.sqrt(self.fibVolRatio / math.pi)
-        e = 1 - self.matMat.E / self.matFib.E_ortho
+        e = 1 - self.matMat.E_para / self.matFib.E_ortho
         g = 1 - self.matMat.G / self.matFib.G
         q_G = (1 + 2 * g * v) / (1 - 2 * g * v)
         q_E = (1 + 2 * e * v) / (1 - 2 * e * v)
 
         self.E_para = self.kapa[0] * (
             self.matFib.E_para * self.fibVolRatio
-            + self.matMat.E * (1 - self.fibVolRatio)
+            + self.matMat.E_para * (1 - self.fibVolRatio)
         )
         self.E_ortho = (
             self.kapa[1]
-            * self.matMat.E
+            * self.matMat.E_para
             * (
                 1
                 - 2 * v
@@ -186,8 +187,9 @@ class FiberReinforcedMaterialUD(Material2D):
                 )
             )
         )
-        self.v_para_ortho = self.matFib.v * self.fibVolRatio + self.matMat.v * (
-            1 - self.fibVolRatio
+        self.v_para_ortho = (
+            self.matFib.v_para_ortho * self.fibVolRatio
+            + self.matMat.v_para_ortho * (1 - self.fibVolRatio)
         )
         self.calc_poissonRatio_ortho_pata()
         self.calc_density()

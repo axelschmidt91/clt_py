@@ -29,19 +29,19 @@ def test_IsotropicMaterial():
     mat_iso = IsotropicMaterial(rho=1, E=10, v=0.25)
     assert mat_iso.G == 4
     mat_iso = IsotropicMaterial(rho=1, E=10, G=4)
-    assert mat_iso.v == 0.25
+    assert mat_iso.v_para_ortho == 0.25
     mat_iso = IsotropicMaterial(rho=1, G=4, v=0.25)
-    assert mat_iso.E == 10
+    assert mat_iso.E_para == 10
 
 
 def test_AnisotropicMaterial():
-    mat_aniso = AnisotropicMaterial(rho=1, v=0.25, E_para=10, E_ortho=2, G=3)
+    mat_aniso = AnisotropicMaterial(rho=1, v_para_ortho=0.25, E_para=10, E_ortho=2, G=3)
     assert isinstance(mat_aniso, AnisotropicMaterial)
 
 
 def test_FiberReinforcedMaterialUD():
     matMat = IsotropicMaterial(rho=1, E=1, v=0.25)
-    matFib = AnisotropicMaterial(rho=2, v=0.25, E_para=10, E_ortho=2, G=3)
+    matFib = AnisotropicMaterial(rho=2, v_para_ortho=0.25, E_para=10, E_ortho=2, G=3)
 
     ply = FiberReinforcedMaterialUD(matFib=matFib, matMat=matMat)
 
@@ -53,7 +53,7 @@ def test_FiberReinforcedMaterialUD():
 
 def test_FiberReinforcedMaterialUD_prismatic_jones_model():
     matMat = IsotropicMaterial(rho=1, E=1, v=0.25)
-    matFib = AnisotropicMaterial(rho=2, v=0.25, E_para=10, E_ortho=2, G=3)
+    matFib = AnisotropicMaterial(rho=2, v_para_ortho=0.25, E_para=10, E_ortho=2, G=3)
 
     ply = FiberReinforcedMaterialUD(matFib=matFib, matMat=matMat)
     ply.system = "prismatic_jones"
@@ -67,7 +67,7 @@ def test_FiberReinforcedMaterialUD_prismatic_jones_model():
 
 def test_FiberReinforcedMaterialUD_hsb_model():
     matMat = IsotropicMaterial(rho=1, E=1, v=0.25)
-    matFib = AnisotropicMaterial(rho=2, v=0.25, E_para=10, E_ortho=2, G=3)
+    matFib = AnisotropicMaterial(rho=2, v_para_ortho=0.25, E_para=10, E_ortho=2, G=3)
 
     ply = FiberReinforcedMaterialUD(matFib=matFib, matMat=matMat, kapa=[0.8, 0.8, 0.8])
     FiberReinforcedMaterialUD.system = "hsb"
