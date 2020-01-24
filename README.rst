@@ -5,9 +5,9 @@ CLT Calculation for Python
 
 .. image:: https://img.shields.io/pypi/v/clt_py.svg
         :target: https://pypi.python.org/pypi/clt_py
-
-.. image:: https://travis-ci.com/axelschmidt91/clt_py.svg?branch=master
-        :target: https://travis-ci.com/axelschmidt91/clt_py
+        
+.. image:: https://github.com/axelschmidt91/clt_py/workflows/CI/badge.svg?branch=master
+        :target: https://github.com/axelschmidt91/clt_py/actions
 
 .. image:: https://readthedocs.org/projects/clt-py/badge/?version=latest
         :target: https://clt-py.readthedocs.io/en/latest/?badge=latest
