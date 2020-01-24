@@ -9,9 +9,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 Unreleased
 ----------
+
+
+0.0.5 (2020-01-24)
+------------------
+
 * changes:
     - version number
     - long_description_conent_type in setup.py
+    - travis API token fixed
+
 
 0.0.4 (2020-01-24)
 ------------------
