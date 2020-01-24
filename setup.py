@@ -36,6 +36,7 @@ setup(
     description="This packages provides methodes for calculating fiber-reinforced materials.",
     install_requires=requirements,
     license="MIT license",
+    long_description_content_type="text/x-rst",
     long_description=readme + "\n\n" + history,
     include_package_data=True,
     keywords="clt_py",
@@ -45,6 +46,6 @@ setup(
     test_suite="tests",
     tests_require=test_requirements,
     url="https://github.com/axelschmidt91/clt_py",
-    version="version='0.0.4'",
+    version="0.0.4",
     zip_safe=False,
 )

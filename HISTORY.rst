@@ -9,7 +9,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 Unreleased
 ----------
-
+* changes:
+    - version number
+    - long_description_conent_type in setup.py
 
 0.0.4 (2020-01-24)
 ------------------
@@ -45,6 +47,6 @@ Unreleased
     * changed usage.rst - new Version update to use package
 
 0.0.2 (2020-01-22)
------------------
+------------------
 * setup of package
 * first ideas of structure
