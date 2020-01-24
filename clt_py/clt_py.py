@@ -353,6 +353,7 @@ class Laminate:
         self.stack = []
         self.stack2 = []
         self.core = False
+        self.move_reference_plane = True
         self.update()
 
     def addPly(self, ply):
@@ -378,6 +379,10 @@ class Laminate:
         self.calc_z_positions()
         self.calc_completeStiffnessmatrix()
 
+    def set_move_reference_plane(self, boolean):
+        self.move_reference_plane = boolean
+        self.update()
+
     def create_finalStack(self):
         if self.core and self.symetric:
             self.finalStack = self.stack + [self.corePly] + self.stack[::-1]
@@ -395,8 +400,11 @@ class Laminate:
         z = [0]
         for ply in self.finalStack:
             z.append(ply.thickness + z[-1])
-        t_ges = z[-1] - z[0]
-        self.z_position = [(z_i - t_ges / 2) for z_i in z]
+        if self.move_reference_plane:
+            t_ges = z[-1] - z[0]
+            self.z_position = [(z_i - t_ges / 2) for z_i in z]
+        else:
+            self.z_position = z
 
     def get_z_positions(self):
         return self.z_position

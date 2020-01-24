@@ -388,6 +388,7 @@ def test_Laminate_stiffnessMatrix_exzentric_orthotrop():
     laminate = Laminate()
     laminate.addPly(ply0)
     laminate.addPly(ply90)
+    laminate.set_move_reference_plane(False)
 
     print(ply0.Q)
     print(ply90.Q)
