@@ -53,7 +53,7 @@ class Material2D:
 
 
 class IsotropicMaterial(Material2D):
-    def __init__(self, rho, label="material", E=None, G=None, v=None):
+    def __init__(self, rho, E=None, G=None, v=None, label="material"):
         if (G is not None) and (v is not None) and (E is not None):
             raise OverDeterminedError()
         elif (
@@ -273,6 +273,7 @@ class Ply:
         self.calc_rotationStressMatrix()
         self.calc_stiffnessMatrix()
         self.calc_complianceMatrix()
+        self.calc_engineer_constantes()
 
     def check_materialType(self, material):
         if isinstance(material, FiberReinforcedMaterialUD):
@@ -288,19 +289,19 @@ class Ply:
         self.rotStress = np.array(
             [
                 [
-                    sqrt(cos(self.rotRad)),
-                    sqrt(sin(self.rotRad)),
+                    (cos(self.rotRad)) ** 2,
+                    (sin(self.rotRad)) ** 2,
                     2 * sin(self.rotRad) * cos(self.rotRad),
                 ],
                 [
-                    sqrt(sin(self.rotRad)),
-                    sqrt(cos(self.rotRad)),
+                    (sin(self.rotRad)) ** 2,
+                    (cos(self.rotRad)) ** 2,
                     -2 * sin(self.rotRad) * cos(self.rotRad),
                 ],
                 [
                     -sin(self.rotRad) * cos(self.rotRad),
                     sin(self.rotRad) * cos(self.rotRad),
-                    sqrt(cos(self.rotRad)) - sqrt(sin(self.rotRad)),
+                    (cos(self.rotRad)) ** 2 - (sin(self.rotRad)) ** 2,
                 ],
             ]
         )
@@ -309,19 +310,19 @@ class Ply:
         self.rotElongation = np.array(
             [
                 [
-                    sqrt(cos(self.rotRad)),
-                    sqrt(sin(self.rotRad)),
+                    (cos(self.rotRad)) ** 2,
+                    (sin(self.rotRad)) ** 2,
                     sin(self.rotRad) * cos(self.rotRad),
                 ],
                 [
-                    sqrt(sin(self.rotRad)),
-                    sqrt(cos(self.rotRad)),
+                    (sin(self.rotRad)) ** 2,
+                    (cos(self.rotRad)) ** 2,
                     -sin(self.rotRad) * cos(self.rotRad),
                 ],
                 [
                     -2 * sin(self.rotRad) * cos(self.rotRad),
                     2 * sin(self.rotRad) * cos(self.rotRad),
-                    sqrt(cos(self.rotRad)) - sqrt(sin(self.rotRad)),
+                    (cos(self.rotRad)) ** 2 - (sin(self.rotRad)) ** 2,
                 ],
             ]
         )
@@ -337,6 +338,12 @@ class Ply:
             self.rotStress,
             np.matmul(self.mat.stiffnessMatrix, np.linalg.inv(self.rotElongation)),
         )
+
+    def calc_engineer_constantes(self):
+        self.E_1 = 1 / self.S[0, 0]
+        self.E_2 = 1 / self.S[1, 1]
+        self.G = 1 / self.S[2, 2]
+        self.v_12 = -self.E_1 * self.S[0, 1]
 
 
 class Laminate:
