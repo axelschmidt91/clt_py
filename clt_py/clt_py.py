@@ -33,6 +33,8 @@ class Material2D:
         self.E_ortho = E_ortho
         self.G = G
         self.v_para_ortho = v_para_ortho
+        self.calc_stiffness_compliance_matrices()
+        self.calc_poissonRatio_ortho_pata()
 
     def calc_poissonRatio_ortho_pata(self):
         self.v_ortho_para = self.v_para_ortho * self.E_ortho / self.E_para
@@ -153,6 +155,16 @@ class FiberReinforcedMaterialUD(Material2D):
         self.matMat = matMat
         self.update()
 
+    def set_kapa(self, kapa):
+        if isinstance(kapa, list):
+            if len(kapa) == 3:
+                self.kapa = kapa
+            else:
+                raise IndexError()
+        else:
+            raise TypeError()
+        self.update()
+
     def check_matFib(self, matFib):
         if not isinstance(matFib, AnisotropicMaterial):
             raise Material2D.NotAnisotropicError()
@@ -251,6 +263,10 @@ class Ply:
         self.rotRad = math.radians(rotation)
         self.update()
 
+    def set_rotation(self, rotation):
+        self.rotRad = math.radians(rotation)
+        self.update()
+
     def update(self):
         self.calc_rotationElongationMatrix()
         self.calc_rotationStressMatrix()
@@ -323,13 +339,99 @@ class Ply:
 
 
 class Laminate:
-    def __init__(self, core=False, symetric=False):
+    def __init__(self, symetric=False):
         super().__init__()
+        self.symetric = symetric
         self.stack = []
-        self.create_finalStack()
+        self.stack2 = []
+        self.core = False
+        self.update()
 
     def addPly(self, ply):
-        pass
+        if isinstance(ply, Ply):
+            if not self.core:
+                self.stack.append(ply)
+            else:
+                self.stack2.append(ply)
+        else:
+            raise TypeError()
+        self.update()
+
+    def addCore(self, ply):
+        if isinstance(ply, Ply):
+            self.corePly = ply
+        else:
+            raise TypeError()
+        self.core = True
+        self.update()
+
+    def update(self):
+        self.create_finalStack()
+        self.calc_z_positions()
+        self.calc_completeStiffnessmatrix()
 
     def create_finalStack(self):
-        pass
+        if self.core and self.symetric:
+            self.finalStack = self.stack + [self.corePly] + self.stack[::-1]
+        elif self.symetric:
+            self.finalStack = self.stack + self.stack[::-1]
+        elif self.core:
+            self.finalStack = self.stack + [self.corePly] + self.stack2
+        else:
+            self.finalStack = self.stack
+
+    def get_finalStack(self):
+        return self.finalStack
+
+    def calc_z_positions(self):
+        z = [0]
+        for ply in self.finalStack:
+            z.append(ply.thickness + z[-1])
+        t_ges = z[-1] - z[0]
+        self.z_position = [(z_i - t_ges / 2) for z_i in z]
+
+    def get_z_positions(self):
+        return self.z_position
+
+    def calc_completeStiffnessmatrix(self):
+        # A matrix: extensional stiffnesses
+        A = np.zeros((3, 3))
+        for i in range(3):
+            for j in range(3):
+                for k_ply in range(len(self.finalStack)):
+                    A[i, j] += self.finalStack[k_ply].Q[i, j] * (
+                        self.z_position[k_ply + 1] - self.z_position[k_ply]
+                    )
+
+        # B matrix: bending-extension coupling stiffnesses
+        B = np.zeros((3, 3))
+        for i in range(3):
+            for j in range(3):
+                for k_ply in range(len(self.finalStack)):
+                    B[i, j] += (
+                        -self.finalStack[k_ply].Q[i, j]
+                        * 0.5
+                        * (
+                            self.z_position[k_ply + 1] ** 2
+                            - self.z_position[k_ply] ** 2
+                        )
+                    )
+        # D matrix: bending stiffnesses
+        D = np.zeros((3, 3))
+        for i in range(3):
+            for j in range(3):
+                for k_ply in range(len(self.finalStack)):
+                    D[i, j] += (
+                        self.finalStack[k_ply].Q[i, j]
+                        * 1
+                        / 3
+                        * (
+                            self.z_position[k_ply + 1] ** 3
+                            - self.z_position[k_ply] ** 3
+                        )
+                    )
+
+        self.stiffnessMatrix = np.block([[A, B], [B, D]])
+
+    def get_stiffnessMatrix(self):
+        return self.stiffnessMatrix

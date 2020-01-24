@@ -211,3 +211,47 @@ def test_Ply_rotationStressMatrix():
     assert round(ply45.S[1, 2], 5) == 0
     assert round(ply45.S[2, 0], 5) == 0
     assert round(ply45.S[2, 1], 5) == 0
+
+
+def test_Laminate_add():
+    matMat = IsotropicMaterial(rho=1, E=1, v=0.25)
+    matFib = AnisotropicMaterial(rho=2, v_para_ortho=0.25, E_para=10, E_ortho=2, G=3)
+
+    mat_FRM = FiberReinforcedMaterialUD(matFib=matFib, matMat=matMat)
+
+    ply0 = Ply(mat_FRM)
+    ply90 = Ply(mat_FRM, rotation=90)
+    ply45 = Ply(mat_FRM, rotation=45)
+    plyCore = Ply(matMat, thickness=5)
+
+    laminate = Laminate()
+    laminate.addPly(ply0)
+    laminate.addPly(ply90)
+    laminate.addPly(ply45)
+    laminate.addCore(plyCore)
+
+    assert isinstance(laminate, Laminate)
+
+
+def test_Laminate_stiffnessMatrix_classic_orthotrop():
+    matMat = IsotropicMaterial(rho=1, E=1, v=0.25)
+    matFib = AnisotropicMaterial(rho=2, v_para_ortho=0.25, E_para=10, E_ortho=2, G=3)
+
+    mat_FRM = FiberReinforcedMaterialUD(matFib=matFib, matMat=matMat)
+
+    ply0 = Ply(mat_FRM)
+    ply90 = Ply(mat_FRM, rotation=90, thickness=1)
+
+    laminate = Laminate()
+    laminate.addPly(ply0)
+    # laminate.addPly(ply90)
+    laminate.addPly(ply90)
+    # laminate.addPly(ply0)
+
+    np.set_printoptions(precision=3, suppress=True)
+    print(laminate.get_stiffnessMatrix())
+    assert np.array_equal(laminate.get_stiffnessMatrix()[0:3, 3:6], np.zeros((3, 3)))
+    assert np.array_equal(laminate.get_stiffnessMatrix()[3:6, 0:3], np.zeros((3, 3)))
+    assert np.array_equal(laminate.get_stiffnessMatrix()[0:2, 2:6], np.zeros((2, 4)))
+    assert np.array_equal(laminate.get_stiffnessMatrix()[0:5, 5:6], np.zeros((5, 1)))
+    assert False
