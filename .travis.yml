@@ -17,6 +17,6 @@ deploy:
   password:
     secure: 0BMMpo0vpihR6Wc02S9GB4xREtgI/0Pwe9RPkTjvp4KySDIqWCyqqWEZA8b4eq9Zux8IbqZpglrudjXzNV1JYedlVSOutjK6eJjpHhCCY3aPd5Ua7sn6HC+eDy4XQksD6xt2h5W4byFKjJNkpSSnLv7SMhiXIjceOxhZtjEPhdreTiZxGB2mz2iceFlGwE05qIG8JVjCrfS7PV/b189jxjnc6yKgiQHJl4y/1AEJr+tM+4XyxnornSle9oLDiQz/gMSwzFd1/9gZqbZqHsAskunnXPatTejtURjCLmgOchD4HCr78cpOa+wFGTvl0DvT7MBjLgHmL6Bh7M9xdxJ8rrFutSQ9/57xEqjt9OFZEFQWIhWQ3PMAg8GsUWdX9nlaoEonmd/h+2Wr7LWo9XSqOtWXGEFAIGA26+jp/PIrvdoPo1sNtX7YVqjnNRqYckchY9OSOVXHKjeXiWQfS0IFqk+kY45fJF/6Xs948M1IbtZYsXt1dsp1XzxXb/Y9h6sjzrmT1YJ2Q8byGD4knsRAZgfDKo5MaUUZ1L1U3GURiSTzt71nTdY0uuJtHXRwV4B0JcQU0n0ePZ9klZc2w+VLvg9dWTkqppufktMsOLhW3Tu+TDKzF09fhH5F6y9QhyKgCyI+FZ0N8fSg8/dsCrv9H5nZtq/pX0Ypfk9V7zwyD7E=
   on:
-    branch: master
+    tags: true
     python: 3.8
 after_success: coveralls
