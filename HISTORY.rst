@@ -11,6 +11,16 @@ Unreleased
 ----------
 
 
+0.0.4 (2020-01-24)
+------------------
+
+* changed:
+    - requirements_dev.txt to updated packades
+    - requirements.txt
+* fixed:
+    - upload to pypi with API Token
+
+
 0.0.3 (2020-01-24)
 ------------------
 
