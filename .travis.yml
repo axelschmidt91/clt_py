@@ -7,16 +7,15 @@ install:
 - pip install -U tox-travis
 - pip install coveralls
 before_script:
-    # run black to check if some files would need reformatting
-    - black --check . || true
+- black --check . || true
 script:
 - tox
 deploy:
   provider: pypi
   distributions: sdist bdist_wheel
-  user: axelschmidt
+  user: __token__
   password:
-    secure: N3K7j3jIOISRwWd2W0XFLeMt0lKlw/4JXK9VWtVrAdQ09j5kmFPl97UGcdA7k1LVRplm7VahnmZHmIH8hbXwHti6vUIm4AXsdiKBb4F9dpurPr74kbUyNcEkils7pl/ZgKb0IyLiSjIaq6KutCslnfOcZ4dL/lhy2CxADrepMkm1dg9epRnwCsujcu19W+j2vKbFUNzUNCqWVLdpByW3zcHKdYkxuAqy05EqPL8a/8228eLkKR8XLMZvh0dq/O869H/4CP9C6yf7u0Tw9N6o9hfX7uLG5oeXSZQEq8Vuf6TkgNwmqnd1iRWnPta5eOlTLfY0Qnbh4haUOB3zjTyKfGojp/hGDT8p6oK8uWPtZQAb1OT83WUH9JpnGCIt56nJlzA3RLTJjwsUMiDzlIApRy1vDCguPjYmcHd88APUrw4rmCAjrpxutEBay04FrGI7+nLNI+R93OAKCG1FHuacH5qmn/YRVYPWSy34oZS64l9UMTeSZy01EsWEgeOXq9ns4gi1B5ljYuafIG8kGdtCnabxAK8YBhhalUxW7N3lVsNk1gzGy15EhNwKtwjdNVeRpOTbyrFyr7vWhxv8Vb5qEY0+xfaao3nmjQ8x1SlSuyGIRLL78Y9wAKItA1hcNsASXZ3vCiOl9OvgQ+LlLCytHdjaEI+wBL+3AyXW45oHOhk=
+    secure: geqKfwrUSdUzGZcfAHrjX7lC8+kKfUFuVWwWgTL8qE5WBzu9Gx0oNgmwnNaQGiJG7msv9XiPCIxx0J8oYqdnhBFo6K1+2lD0WNLrzQjG8VcvDOHif4Ztr18Y6wVU4VGG6SVea1HHP7HIVZk4gmNkRd7W6p28KNgQCJF9aPVGYS1dVy31cvKH5dwF3sXdEmlQ+JRYrMhlbJJ+P2JcmtrKlZmSsPgMXavLLv8EX7ac44QqogJb9CoZJSlbrWaF3DkLe1BVaE5d4dKmD+u6oSPeJW8XTyN02sUrqNGAokt8huws8FMiCZC8bAwbPWaBiUiBMzuilJuBKJFJTjZLw4yWRlLBViKQAEfZWAI7IDk1i5m+iL9fk3Hmi0+CiSplE5dpdEXOdzZ9jnfpXCnrEk1zfPi2FTjMqNKHfKG3Wi5ibs5KA07hIZFaAhbIlvsmCjlg3GKENeQaO0d3+p0O+EmkxvdOyZBS3VIcEjb/TxN+agrc/VAA3wMg1UOQo/0XfhjdPR17QO9wcvv1SHKeOJoJP/iyv3zON6BbyLKIxob/OwDCD+L7dIQPPC3Er8P2h4aMLaKo3w1pPeFfH4EFgjN6oH4ZMJPXkUIGRF7v2VSWcpfAL5PxytCJD5yW8KUp55jQITAwWjanat7vYuaVkSUbiD80z3LUNnmuYMS8qPC3rao=
   on:
     tags: true
     repo: axelschmidt91/clt_py
