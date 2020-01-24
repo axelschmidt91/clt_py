@@ -33,8 +33,8 @@ class Material2D:
         self.E_ortho = E_ortho
         self.G = G
         self.v_para_ortho = v_para_ortho
-        self.calc_stiffness_compliance_matrices()
         self.calc_poissonRatio_ortho_pata()
+        self.calc_stiffness_compliance_matrices()
 
     def calc_poissonRatio_ortho_pata(self):
         self.v_ortho_para = self.v_para_ortho * self.E_ortho / self.E_para
@@ -42,11 +42,12 @@ class Material2D:
     def calc_stiffness_compliance_matrices(self):
         s_para = 1 / self.E_para
         s_ortho = 1 / self.E_ortho
-        s_para_ortho = -self.v_para_ortho / self.E_para
+        s_para_ortho = -self.v_ortho_para / self.E_ortho
+        s_ortho_para = -self.v_para_ortho / self.E_para
         s_shear = 1 / self.G
 
         self.complianceMatrix = np.array(
-            [[s_para, s_para_ortho, 0], [s_para_ortho, s_para, 0], [0, 0, s_shear]]
+            [[s_para, s_para_ortho, 0], [s_para_ortho, s_ortho, 0], [0, 0, s_shear]]
         )
         self.stiffnessMatrix = np.linalg.inv(self.complianceMatrix)
 
@@ -120,8 +121,8 @@ class FiberReinforcedMaterialUD(Material2D):
         self.update()
         super().__init__(
             rho=self.rho,
-            E_para=self.rho,
-            E_ortho=self.rho,
+            E_para=self.E_para,
+            E_ortho=self.E_ortho,
             G=self.G,
             v_para_ortho=self.v_para_ortho,
             label=label,

@@ -239,19 +239,233 @@ def test_Laminate_stiffnessMatrix_classic_orthotrop():
 
     mat_FRM = FiberReinforcedMaterialUD(matFib=matFib, matMat=matMat)
 
-    ply0 = Ply(mat_FRM)
+    ply0 = Ply(mat_FRM, rotation=0, thickness=1)
     ply90 = Ply(mat_FRM, rotation=90, thickness=1)
 
     laminate = Laminate()
     laminate.addPly(ply0)
-    # laminate.addPly(ply90)
     laminate.addPly(ply90)
-    # laminate.addPly(ply0)
+    laminate.addPly(ply0)
 
+    # assert preprocessing
     np.set_printoptions(precision=3, suppress=True)
     print(laminate.get_stiffnessMatrix())
-    assert np.array_equal(laminate.get_stiffnessMatrix()[0:3, 3:6], np.zeros((3, 3)))
-    assert np.array_equal(laminate.get_stiffnessMatrix()[3:6, 0:3], np.zeros((3, 3)))
-    assert np.array_equal(laminate.get_stiffnessMatrix()[0:2, 2:6], np.zeros((2, 4)))
-    assert np.array_equal(laminate.get_stiffnessMatrix()[0:5, 5:6], np.zeros((5, 1)))
-    assert False
+
+    compare_matrix = np.zeros((6, 6))
+    compare_matrix[0:2, 0:2] = 1
+    compare_matrix[2:3, 2:3] = 1
+    compare_matrix[3:5, 3:5] = 1
+    compare_matrix[5:6, 5:6] = 1
+    print(compare_matrix)
+
+    (bx, by) = np.nonzero(np.round(laminate.get_stiffnessMatrix(), 3))
+    lam_matrix = np.zeros(laminate.get_stiffnessMatrix().shape)
+    for x, y in zip(bx, by):
+        lam_matrix[x, y] = 1
+
+    assert np.array_equal(lam_matrix, compare_matrix)
+
+
+def test_Laminate_stiffnessMatrix_general_anisotrop():
+    matMat = IsotropicMaterial(rho=1, E=1, v=0.25)
+    matFib = AnisotropicMaterial(rho=2, v_para_ortho=0.25, E_para=10, E_ortho=2, G=3)
+
+    mat_FRM = FiberReinforcedMaterialUD(matFib=matFib, matMat=matMat)
+
+    plyP45 = Ply(mat_FRM, rotation=45, thickness=1)
+    plyN45 = Ply(mat_FRM, rotation=-45, thickness=1)
+
+    laminate = Laminate()
+    laminate.addPly(plyP45)
+    laminate.addPly(plyN45)
+    laminate.addPly(plyP45)
+
+    # assert preprocessing
+    np.set_printoptions(precision=3, suppress=True)
+    print(laminate.get_stiffnessMatrix())
+
+    compare_matrix = np.zeros((6, 6))
+    compare_matrix[0:3, 0:3] = 1
+    compare_matrix[3:6, 3:6] = 1
+    print(compare_matrix)
+
+    (bx, by) = np.nonzero(np.round(laminate.get_stiffnessMatrix(), 3))
+    lam_matrix = np.zeros(laminate.get_stiffnessMatrix().shape)
+    for x, y in zip(bx, by):
+        lam_matrix[x, y] = 1
+
+    assert np.array_equal(lam_matrix, compare_matrix)
+
+
+def test_Laminate_stiffnessMatrix_orthotrop_as_disc():
+    matMat = IsotropicMaterial(rho=1, E=1, v=0.25)
+    matFib = AnisotropicMaterial(rho=2, v_para_ortho=0.25, E_para=10, E_ortho=2, G=3)
+
+    mat_FRM = FiberReinforcedMaterialUD(matFib=matFib, matMat=matMat)
+
+    plyP45 = Ply(mat_FRM, rotation=45, thickness=1)
+    plyN45 = Ply(mat_FRM, rotation=-45, thickness=2)
+
+    laminate = Laminate()
+    laminate.addPly(plyP45)
+    laminate.addPly(plyN45)
+    laminate.addPly(plyP45)
+
+    # assert preprocessing
+    np.set_printoptions(precision=3, suppress=True)
+    print(laminate.get_stiffnessMatrix())
+
+    compare_matrix = np.zeros((6, 6))
+    compare_matrix[0:2, 0:2] = 1
+    compare_matrix[2:3, 2:3] = 1
+    compare_matrix[3:6, 3:6] = 1
+    print(compare_matrix)
+
+    (bx, by) = np.nonzero(np.round(laminate.get_stiffnessMatrix(), 3))
+    lam_matrix = np.zeros(laminate.get_stiffnessMatrix().shape)
+    for x, y in zip(bx, by):
+        lam_matrix[x, y] = 1
+
+    assert np.array_equal(lam_matrix, compare_matrix)
+
+
+def test_Laminate_stiffnessMatrix_orthotrop_as_plate():
+    matMat = IsotropicMaterial(rho=1, E=1, v=0.25)
+    matFib = AnisotropicMaterial(rho=2, v_para_ortho=0.25, E_para=10, E_ortho=2, G=3)
+
+    mat_FRM = FiberReinforcedMaterialUD(matFib=matFib, matMat=matMat)
+
+    plyP45 = Ply(mat_FRM, rotation=45, thickness=1)
+    plyN45 = Ply(mat_FRM, rotation=-45, thickness=6)
+
+    laminate = Laminate()
+    laminate.addPly(plyP45)
+    laminate.addPly(plyN45)
+    laminate.addPly(plyP45)
+
+    # assert preprocessing
+    np.set_printoptions(precision=3, suppress=True)
+    print(laminate.get_stiffnessMatrix())
+
+    compare_matrix = np.zeros((6, 6))
+    compare_matrix[0:3, 0:3] = 1
+    compare_matrix[3:5, 3:5] = 1
+    compare_matrix[5:6, 5:6] = 1
+    print(compare_matrix)
+
+    (bx, by) = np.nonzero(np.round(laminate.get_stiffnessMatrix(), 3))
+    lam_matrix = np.zeros(laminate.get_stiffnessMatrix().shape)
+    for x, y in zip(bx, by):
+        lam_matrix[x, y] = 1
+
+    assert np.array_equal(lam_matrix, compare_matrix)
+
+
+def test_Laminate_stiffnessMatrix_exzentric_orthotrop():
+    matMat = IsotropicMaterial(rho=1, E=1, v=0.25)
+    matFib = AnisotropicMaterial(rho=2, v_para_ortho=0.25, E_para=10, E_ortho=2, G=3)
+
+    mat_FRM = FiberReinforcedMaterialUD(matFib=matFib, matMat=matMat)
+
+    ply0 = Ply(mat_FRM, rotation=0, thickness=1)
+    ply90 = Ply(mat_FRM, rotation=90, thickness=3)
+
+    laminate = Laminate()
+    laminate.addPly(ply0)
+    laminate.addPly(ply90)
+
+    # assert preprocessing
+    np.set_printoptions(precision=3, suppress=True)
+    print(laminate.get_stiffnessMatrix())
+
+    compare_matrix = np.zeros((6, 6))
+    compare_matrix[0:2, 0:2] = 1
+    compare_matrix[2:3, 2:3] = 1
+    compare_matrix[3:5, 3:5] = 1
+    compare_matrix[5:6, 5:6] = 1
+
+    compare_matrix[0:2, 3:5] = 1
+    compare_matrix[2:3, 5:6] = 1
+    compare_matrix[3:5, 0:2] = 1
+    compare_matrix[5:6, 2:3] = 1
+
+    print(compare_matrix)
+
+    (bx, by) = np.nonzero(np.round(laminate.get_stiffnessMatrix(), 3))
+    lam_matrix = np.zeros(laminate.get_stiffnessMatrix().shape)
+    for x, y in zip(bx, by):
+        lam_matrix[x, y] = 1
+
+    assert np.array_equal(lam_matrix, compare_matrix)
+
+
+def test_Laminate_stiffnessMatrix_exzentric_orthotrop_same_thickness():
+    matMat = IsotropicMaterial(rho=1, E=1, v=0.25)
+    matFib = AnisotropicMaterial(rho=2, v_para_ortho=0.25, E_para=10, E_ortho=2, G=3)
+
+    mat_FRM = FiberReinforcedMaterialUD(matFib=matFib, matMat=matMat)
+
+    ply0 = Ply(mat_FRM, rotation=0, thickness=1)
+    ply90 = Ply(mat_FRM, rotation=90, thickness=1)
+
+    laminate = Laminate()
+    laminate.addPly(ply0)
+    laminate.addPly(ply90)
+
+    # assert preprocessing
+    np.set_printoptions(precision=3, suppress=True)
+    print(laminate.get_stiffnessMatrix())
+
+    compare_matrix = np.zeros((6, 6))
+    compare_matrix[0:2, 0:2] = 1
+    compare_matrix[2:3, 2:3] = 1
+    compare_matrix[3:5, 3:5] = 1
+    compare_matrix[5:6, 5:6] = 1
+
+    compare_matrix[0:1, 3:4] = 1
+    compare_matrix[1:2, 4:5] = 1
+    compare_matrix[3:4, 0:1] = 1
+    compare_matrix[4:5, 1:2] = 1
+    print(compare_matrix)
+
+    (bx, by) = np.nonzero(np.round(laminate.get_stiffnessMatrix(), 3))
+    lam_matrix = np.zeros(laminate.get_stiffnessMatrix().shape)
+    for x, y in zip(bx, by):
+        lam_matrix[x, y] = 1
+
+    assert np.array_equal(lam_matrix, compare_matrix)
+
+
+def test_Laminate_stiffnessMatrix_antimetric_middle_layer():
+    matMat = IsotropicMaterial(rho=1, E=1, v=0.25)
+    matFib = AnisotropicMaterial(rho=2, v_para_ortho=0.25, E_para=10, E_ortho=2, G=3)
+
+    mat_FRM = FiberReinforcedMaterialUD(matFib=matFib, matMat=matMat)
+
+    ply0 = Ply(mat_FRM, rotation=0, thickness=1)
+    plyP45 = Ply(mat_FRM, rotation=45, thickness=1)
+    plyN45 = Ply(mat_FRM, rotation=-45, thickness=1)
+
+    laminate = Laminate()
+    laminate.addPly(plyP45)
+    laminate.addPly(ply0)
+    laminate.addPly(plyN45)
+
+    # assert preprocessing
+    np.set_printoptions(precision=3, suppress=True)
+    print(laminate.get_stiffnessMatrix())
+
+    compare_matrix = np.zeros((6, 6))
+    compare_matrix[0:2, 0:2] = 1
+    compare_matrix[2:5, 2:5] = 1
+    compare_matrix[5:6, 5:6] = 1
+    compare_matrix[0:2, 5:6] = 1
+    compare_matrix[5:6, 0:2] = 1
+    print(compare_matrix)
+
+    (bx, by) = np.nonzero(np.round(laminate.get_stiffnessMatrix(), 3))
+    lam_matrix = np.zeros(laminate.get_stiffnessMatrix().shape)
+    for x, y in zip(bx, by):
+        lam_matrix[x, y] = 1
+
+    assert np.array_equal(lam_matrix, compare_matrix)
