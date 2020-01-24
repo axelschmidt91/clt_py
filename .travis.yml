@@ -6,6 +6,9 @@ python:
 install:
 - pip install -U tox-travis
 - pip install coveralls
+before_script:
+    # run black to check if some files would need reformatting
+    - black --check . || true
 script:
 - tox
 deploy:
