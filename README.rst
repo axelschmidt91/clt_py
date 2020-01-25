@@ -17,8 +17,8 @@ CLT Calculation for Python
         :target: https://pyup.io/repos/github/axelschmidt91/clt_py/
         :alt: Updates
 
-.. image:: https://coveralls.io/repos/github/axelschmidt91/clt_py/badge.svg?branch=master
-        :target: https://coveralls.io/github/axelschmidt91/clt_py?branch=master
+.. image:: https://codecov.io/gh/axelschmidt91/clt_py/branch/master/graph/badge.svg
+        :target: https://codecov.io/gh/axelschmidt91/clt_py
 
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
         :target: https://github.com/psf/black
