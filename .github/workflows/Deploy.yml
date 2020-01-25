@@ -5,6 +5,7 @@ on:
     types: [created]
 
 jobs:
+    
   deploy:
     runs-on: ubuntu-latest
     steps:
@@ -13,7 +14,13 @@ jobs:
       uses: actions/setup-python@v1
       with:
         python-version: '3.x'
-    - name: Install dependencies
+    - name: Install dependencies testing
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox tox-gh-actions
+    - name: Test with tox
+      run: tox
+    - name: Install dependencies deploying
       run: |
         python -m pip install --upgrade pip
         pip install setuptools wheel twine
